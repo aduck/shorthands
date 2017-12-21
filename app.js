@@ -8,7 +8,7 @@ app.use(bodyParser())
 // 配置路由
 app.use(router.routes())
 // 错误处理
-app.on('error', (err, ctx) => {
-  ctx.body = err
-})
+// app.on('error', (err, ctx) => {
+//   ctx.body = err
+// })
 module.exports = app

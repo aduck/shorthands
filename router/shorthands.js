@@ -1,10 +1,11 @@
-const model = require('../model')
+const model = require('../model/shorthands')
 const Router = require('koa-router')
-const ObjectId = require('mongodb').ObjectId
+const {ObjectId} = require('mongodb')
 const router = new Router()
 
 router.get('/', async ctx => {
   let q = ctx.query
+  if (ctx.user.username !== 'admin') q.by = ctx.user.nickname
   ctx.body = await model.query(q)
 })
 router.post('/', async ctx => {
@@ -13,7 +14,7 @@ router.post('/', async ctx => {
     content: body.content,
     type: body.type,
     tags: body.tags || [],
-    by: 'test', // todo，先写死等做完权限
+    by: ctx.user.nickname,
     at: new Date(),
     status: 0,
     summary: body.summary || ''
@@ -21,6 +22,13 @@ router.post('/', async ctx => {
   ctx.body = await model.add(params)
 })
 router.del('/:id', async ctx => {
+  if (ctx.user.username !== 'admin') {
+    ctx.body = {
+      code: -1,
+      message: '你真不是管理员'
+    }
+    return
+  }
   let id = ctx.params.id
   ctx.body = await model.dropById(new ObjectId(id))
 })
